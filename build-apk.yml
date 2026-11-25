@@ -9,7 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
-
     steps:
       - uses: actions/checkout@v4
 
@@ -22,25 +21,24 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Build APK
+      - name: Build updated game
         shell: bash
         run: |
-          if [ -f "WALL_STREET_v2 (2)/app/package.json" ]; then
-            cd "WALL_STREET_v2 (2)/app"
-          elif [ -f "WALL_STREET_v2 (2)/package.json" ]; then
-            cd "WALL_STREET_v2 (2)"
-          else
-            echo "Updated game not found"
-            exit 1
-          fi
+          cd "WALL_STREET_v2 (2)/app"
+
+          pwd
+          test -f src/components/Tutorial.tsx
+          grep -Fq 'career-entry' src/components/TitleScreen.tsx
 
           npm install
           npm run build
 
+          grep -R -Fq --include='*.js' 'career-entry' dist
+
           npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7
 
           if [ ! -f capacitor.config.ts ] && [ ! -f capacitor.config.json ] && [ ! -f capacitor.config.js ]; then
-            npx cap init 'WALL STREET 2.0' com.wallstreet.trader --web-dir dist
+            npx cap init "WALL STREET 2.0" com.wallstreet.trader --web-dir dist
           fi
 
           if [ ! -d android ]; then
@@ -48,16 +46,15 @@ jobs:
           fi
 
           npx cap sync android
-
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
 
-          cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/WALL_STREET_v2.apk"
+          cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/WALL_STREET_2.0.apk"
 
-      - name: Upload APK
+      - name: Upload updated APK
         uses: actions/upload-artifact@v4
         with:
-          name: WALL_STREET_v2
-          path: WALL_STREET_v2.apk
+          name: WALL_STREET_2.0
+          path: WALL_STREET_2.0.apk
           if-no-files-found: error
