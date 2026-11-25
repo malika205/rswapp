@@ -1,0 +1,18 @@
+WALL STREET 2.0 — Android
+
+1. Extract the ZIP. Open the extracted folder.
+2. Create a new, empty GitHub repository. In its Code tab choose Upload files.
+3. Upload ALL the files and folders INSIDE the extracted folder, including .github and src.
+   Do not upload the enclosing folder or just the ZIP. At the repository root you should see:
+   .github / src / scripts / package.json / package-lock.json / capacitor.config.json / index.html.
+4. Commit changes. In Actions open WALL STREET 2.0 - Android APK.
+5. After the green check, open the run and download WALL_STREET_2.0_ANDROID under Artifacts.
+6. Extract this result and install WALL_STREET_2.0.apk on your Android phone.
+   This build uses a separate application ID (com.wallstreet.trader.v2) so it does not replace the old game.
+   Old progress will remain in the old application, not be transferred automatically.
+
+If Actions is empty, the .github directory did not upload. Upload the workflow
+at .github/workflows/build-apk.yml using GitHub's Create new file page.
+
+Windows preview: install Node.js 22 LTS, then double-click START_GAME.cmd.
+The APK build is designed for GitHub Actions; it is not prebuilt inside this source archive.
