@@ -1,0 +1,52 @@
+name: Build WALL STREET APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build APK
+        shell: bash
+        run: |
+          if [ -f app/package.json ]; then
+            cd app
+          elif [ ! -f package.json ]; then
+            echo 'Error: package.json not found in app or repository root'
+            exit 1
+          fi
+          npm install
+          npm run build
+          npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7
+          if [ ! -f capacitor.config.ts ] && [ ! -f capacitor.config.json ] && [ ! -f capacitor.config.js ]; then
+            npx cap init 'WALL STREET' com.wallstreet.trader --web-dir dist
+          fi
+          if [ ! -d android ]; then
+            npx cap add android
+          fi
+          npx cap sync android
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/WALL_STREET.apk"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: WALL_STREET
+          path: WALL_STREET.apk
+          if-no-files-found: error
