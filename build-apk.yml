@@ -1,4 +1,5 @@
-name: Build WALL STREET APK
+
+name: Build WALL STREET 2.0 APK
 
 on:
   push:
@@ -8,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
+
     steps:
       - uses: actions/checkout@v4
 
@@ -23,30 +25,39 @@ jobs:
       - name: Build APK
         shell: bash
         run: |
-          if [ -f app/package.json ]; then
-            cd app
-          elif [ ! -f package.json ]; then
-            echo 'Error: package.json not found in app or repository root'
+          if [ -f "WALL_STREET_v2 (2)/app/package.json" ]; then
+            cd "WALL_STREET_v2 (2)/app"
+          elif [ -f "WALL_STREET_v2 (2)/package.json" ]; then
+            cd "WALL_STREET_v2 (2)"
+          else
+            echo "Updated game not found"
             exit 1
           fi
+
           npm install
           npm run build
+
           npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7
+
           if [ ! -f capacitor.config.ts ] && [ ! -f capacitor.config.json ] && [ ! -f capacitor.config.js ]; then
-            npx cap init 'WALL STREET' com.wallstreet.trader --web-dir dist
+            npx cap init 'WALL STREET 2.0' com.wallstreet.trader --web-dir dist
           fi
+
           if [ ! -d android ]; then
             npx cap add android
           fi
+
           npx cap sync android
+
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
-          cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/WALL_STREET.apk"
+
+          cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/WALL_STREET_v2.apk"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: WALL_STREET
-          path: WALL_STREET.apk
+          name: WALL_STREET_v2
+          path: WALL_STREET_v2.apk
           if-no-files-found: error
